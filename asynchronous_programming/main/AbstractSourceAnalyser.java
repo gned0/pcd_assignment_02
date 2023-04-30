@@ -1,8 +1,6 @@
 package main;
 
-
-import main.SourceAnalyser;
-
+import main.view.AnalyserView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +14,7 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
     private final int ranges;
     private final int maxL;
     private final int numTopFiles;
+    private AnalyserView view;
 
     public AbstractSourceAnalyser(final String initialDirectory,
                        final int ranges,
@@ -35,4 +34,12 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
     abstract public void getReport(String directory);
 
     abstract public void analyzeSources(String directory);
+
+    private void startGUI(int width, int height, InputListener listener){
+        this.view = new AnalyserView(width, height);
+        this.view.addListener(listener);
+        this.view.display();
+    }
+
+
 }
