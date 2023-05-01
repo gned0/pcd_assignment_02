@@ -1,79 +1,81 @@
 package task;
 
-import main.utility.Latch;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class ExecutorDirectoryExplorer {
 
-    public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
-
+    public static void main(String[] args) throws IOException, InterruptedException {
         String directoryPath = "input";
         int topN = 10;
+
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        List<JavaFileLength> fileLengths = new ArrayList<>();
-        List<Future<?>> futureList = new ArrayList<>();
 
-        futureList.add(executor.submit(() -> {
-            searchJavaFiles(directoryPath, fileLengths, executor, futureList);
-        }));
+        List<FileLength> fileLengths = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(1);
 
-        Thread.sleep(2000);
+        searchForFiles(new File(directoryPath), fileLengths, executor, latch);
 
-        boolean allDone = true;
-        for(Future<?> future : futureList){
-            allDone &= future.isDone(); // check if future is done
+        if (latch.getCount() > 0 && executor.submit(() -> latch.countDown()).isDone()) {
+            latch.await();
         }
-
         executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.MINUTES);
 
-        List<JavaFileLength> longestFiles = fileLengths.stream()
-                .sorted(Comparator.comparingInt(JavaFileLength::getLength).reversed())
+        List<FileLength> longestFiles = fileLengths.stream()
+                .sorted(Comparator.comparingLong(FileLength::getLength).reversed())
                 .limit(topN)
                 .collect(Collectors.toList());
 
-        System.out.printf("Top %d longest .java files in %s:%n", topN, directoryPath);
+        System.out.printf("Top %d longest files in %s:%n", topN, directoryPath);
         longestFiles.forEach(System.out::println);
     }
 
-    private static void searchJavaFiles(String directoryPath, List<JavaFileLength> fileLengths, ExecutorService executor, List<Future<?>> futureList) {
-        File directory = new File(directoryPath);
+    private static void searchForFiles(File directory, List<FileLength> fileLengths, ExecutorService executor, CountDownLatch latch) throws InterruptedException {
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file : files) {
-                System.out.println(file);
-                if (file.isFile() && file.getAbsoluteFile().getAbsolutePath().endsWith("java")) {
-                    futureList.add(executor.submit(() -> {
+                if (file.isFile() && file.getName().endsWith(".java")) {
+                    executor.execute(() -> {
                         try {
-                            System.out.println("|| Found file " + file.getAbsolutePath() + " ||");
-                            int length = Files.readAllLines(file.toPath()).stream().mapToInt(String::length).sum();
-                            fileLengths.add(new JavaFileLength(file.getName(), length));
+                            long length = Files.size(file.toPath());
+                            synchronized (fileLengths) {
+                                fileLengths.add(new FileLength(file.getName(), length));
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    }));
+                    });
                 } else if (file.isDirectory()) {
-                    System.out.println("|| Found Directory " + file.getAbsolutePath() + " ||");
-                    futureList.add(executor.submit(() -> {
-                        searchJavaFiles(file.getPath(), fileLengths, executor, futureList);
-                    }));
+                    /*executor.submit(() -> {
+                        try {
+                            searchForFiles(file, fileLengths, executor, latch);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });*/
+                    searchForFiles(file, fileLengths, executor, latch);
                 }
             }
         }
+
+
     }
 
-    private static class JavaFileLength {
+    private static class FileLength {
         private final String fileName;
-        private final int length;
+        private final long length;
 
-        public JavaFileLength(String fileName, int length) {
+        public FileLength(String fileName, long length) {
             this.fileName = fileName;
             this.length = length;
         }
@@ -82,7 +84,7 @@ public class ExecutorDirectoryExplorer {
             return fileName;
         }
 
-        public int getLength() {
+        public long getLength() {
             return length;
         }
 
@@ -92,4 +94,3 @@ public class ExecutorDirectoryExplorer {
         }
     }
 }
-
