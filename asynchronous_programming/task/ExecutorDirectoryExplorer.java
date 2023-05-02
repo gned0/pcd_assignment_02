@@ -24,8 +24,7 @@ public class ExecutorDirectoryExplorer {
         }));
 
 
-        int i = 0;
-        while(i < futureList.size()) {
+        while(futureList.size() > 0) {
             try {
                 futureList.remove().get(); // get will block until the future is done
             } catch (ExecutionException e) {
