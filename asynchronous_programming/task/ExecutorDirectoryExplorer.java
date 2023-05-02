@@ -3,13 +3,8 @@ package task;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class ExecutorDirectoryExplorer {
@@ -22,12 +17,25 @@ public class ExecutorDirectoryExplorer {
 
         List<FileLength> fileLengths = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(1);
+        Queue<Future<?>> futureList = new LinkedBlockingQueue<>();
 
-        searchForFiles(new File(directoryPath), fileLengths, executor, latch);
+        futureList.add(executor.submit(() -> {
+            searchForFiles(new File(directoryPath), fileLengths, executor, futureList);
+        }));
 
-        if (latch.getCount() > 0 && executor.submit(() -> latch.countDown()).isDone()) {
-            latch.await();
+
+        int i = 0;
+        while(i < futureList.size()) {
+            try {
+                futureList.remove().get(); // get will block until the future is done
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
+
+//        if (latch.getCount() > 0 && executor.submit(() -> latch.countDown()).isDone()) {
+//            latch.await();
+//        }
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.MINUTES);
 
@@ -40,12 +48,13 @@ public class ExecutorDirectoryExplorer {
         longestFiles.forEach(System.out::println);
     }
 
-    private static void searchForFiles(File directory, List<FileLength> fileLengths, ExecutorService executor, CountDownLatch latch) throws InterruptedException {
+    private static void searchForFiles(File directory, List<FileLength> fileLengths, ExecutorService executor, Queue<Future<?>> futureList) {
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file : files) {
                 if (file.isFile() && file.getName().endsWith(".java")) {
-                    executor.execute(() -> {
+                    System.out.println("\\\\ File Java found " + file.getAbsolutePath());
+                    futureList.add(executor.submit(() -> {
                         try {
                             long length = Files.size(file.toPath());
                             synchronized (fileLengths) {
@@ -54,16 +63,12 @@ public class ExecutorDirectoryExplorer {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    });
+                    }));
                 } else if (file.isDirectory()) {
-                    /*executor.submit(() -> {
-                        try {
-                            searchForFiles(file, fileLengths, executor, latch);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });*/
-                    searchForFiles(file, fileLengths, executor, latch);
+                    System.out.println("// Directory found " + file.getAbsolutePath());
+                    futureList.add(executor.submit(() -> {
+                        searchForFiles(file, fileLengths, executor, futureList);
+                    }));
                 }
             }
         }
