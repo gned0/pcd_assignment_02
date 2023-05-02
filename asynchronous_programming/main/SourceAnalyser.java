@@ -2,9 +2,15 @@ package main;
 
 public interface SourceAnalyser {
 
-    void getReport(String directory);
+    void getReport(final String directory,
+                   final int ranges,
+                   final int maxL,
+                   final int numTopFiles) throws InterruptedException;
 
-    void analyzeSources(String directory);
+    void analyzeSources(final String directory,
+                        final int ranges,
+                        final int maxL,
+                        final int numTopFiles) throws InterruptedException;
 
 
 }
