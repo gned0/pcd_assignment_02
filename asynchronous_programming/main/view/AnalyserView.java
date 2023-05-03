@@ -19,10 +19,14 @@ public class AnalyserView {
     public void addListener(final InputListener l){
         this.frame.addListener(l);
     }
-    public void update(final List<Integer> intervals, final List<Pair<String, Integer>> topFiles){
+    public void update(final List<Integer> intervals,
+                       final List<Pair<String, Integer>> topFiles,
+                       final int ranges,
+                       final int maxL){
         // updates distribution graph and top files
         this.frame.updateTopFiles(topFiles);
-        this.frame.updateDistributionGraph((ArrayList<Integer>) intervals);
+        this.frame.updateDistributionGraph(intervals, ranges, maxL);
+        System.out.println("ciao");
     }
     public void changeState(final String s){
         this.frame.updateState(s);

@@ -123,8 +123,8 @@ public class ViewFrame extends JFrame implements ActionListener {
     public void updateTopFiles(final List<Pair<String, Integer>> topFiles){
         SwingUtilities.invokeLater(() -> expPanel.updateTopFiles(topFiles));
     }
-    public void updateDistributionGraph(final ArrayList<Integer> intervals){
-        SwingUtilities.invokeLater(() -> expPanel.updateDistributionGraph(intervals));
+    public void updateDistributionGraph(final List<Integer> intervals, final int ranges, final int maxL){
+        SwingUtilities.invokeLater(() -> expPanel.updateDistributionGraph(intervals, ranges, maxL));
     }
 
     public static class ExplorationPanel extends JPanel {
@@ -167,20 +167,18 @@ public class ViewFrame extends JFrame implements ActionListener {
         }
 
 
-        public void updateDistributionGraph(final ArrayList<Integer> intervals) {
+        public void updateDistributionGraph(final List<Integer> intervals, final int ranges, final int maxL) {
             intervalsTable.setRowCount(0);
-            int ranges = numRanges;
-            int maxL = numMaxL;
 
             synchronized (intervals) {
                 for (int i = 0; i < intervals.size(); i++) {
                     String tmp;
                     if (i == 0) {
-                        tmp = "Range [0, " + ((maxL / (ranges - 1)) - 1) + "]:";
+                        tmp = "Range [0, " + ((maxL / (ranges - 1)) - 1) + "]: ";
                     } else if (i == ranges - 1) {
-                        tmp = "Range [" + maxL + ",Infinito]:";
+                        tmp = "Range [" + maxL + ", infinity]: ";
                     } else {
-                        tmp = "Range [" + (maxL / (ranges - 1)) * i + "," + (((maxL / (ranges - 1)) * (i + 1)) - 1) + "]:";
+                        tmp = "Range [" + (maxL / (ranges - 1)) * i + "," + (((maxL / (ranges - 1)) * (i + 1)) - 1) + "]: ";
                     }
                     this.intervalsTable.addRow(new Object[]{tmp, intervals.get(i)});
                 }

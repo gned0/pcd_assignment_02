@@ -57,9 +57,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
         view.display();
         this.setParameters(directory, ranges, maxL, numTopFiles);
         futureList = new LinkedBlockingQueue<>();
-        futureList.add(executor.submit(() -> {
-            fileSearchWithUpdate(directory);
-        }));
+        futureList.add(executor.submit(() -> fileSearchWithUpdate(directory)));
 
 
         while(futureList.size() > 0) {
@@ -70,8 +68,8 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
             }
         }
         executor.shutdown();
-        executor.awaitTermination(1, TimeUnit.MINUTES);
-
+        //executor.awaitTermination(1, TimeUnit.MINUTES);
+        this.printIntervals(intervals);
     }
 
     private void fileSearch(String directory) {
@@ -83,9 +81,6 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
                         int numLines = this.countLines(file);
                         this.updateIntervals(numLines);
                         this.updateTopFiles(file, numLines);
-                        futureList.add(executor.submit(() -> {
-                            view.update(intervals, topFiles);
-                        }));
                     }));
                 } else if (file.isDirectory()) {
                     futureList.add(executor.submit(() -> {
@@ -105,11 +100,13 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
                         int numLines = this.countLines(file);
                         this.updateIntervals(numLines);
                         this.updateTopFiles(file, numLines);
-                        view.update(intervals, topFiles);
+                        futureList.add(executor.submit(() -> {
+                            view.update(intervals, topFiles, ranges, maxL);
+                        }));
                     }));
                 } else if (file.isDirectory()) {
                     futureList.add(executor.submit(() -> {
-                        this.fileSearch(file.getAbsolutePath());
+                        this.fileSearchWithUpdate(file.getAbsolutePath());
                     }));
                 }
             }
