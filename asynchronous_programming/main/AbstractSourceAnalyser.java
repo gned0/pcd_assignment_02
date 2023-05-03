@@ -95,4 +95,23 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
         }
     }
 
+    protected void printTopFiles(List<Pair<String, Integer>> topFiles) {
+        System.out.println("Top Files By Line Count: ");
+        topFiles.forEach(pair -> {
+            System.out.println("File Path: " + pair.first + ", lines: " + pair.second);
+        });
+    }
+
+    protected void printIntervals(List<Integer> intervals) {
+        for (int i = 0; i < ranges; i++) {
+            if (i == 0) {
+                System.out.println("Range [0, " + String.valueOf((maxL / (ranges - 1)) - 1) + "]: " + intervals.get(i));
+            } else if (i == ranges - 1) {
+                System.out.println("Range [" + String.valueOf(maxL) + ", Infinity]: " + intervals.get(i));
+            } else {
+                System.out.println("Range [" + String.valueOf((maxL / (ranges - 1)) * i) + ", " + String.valueOf(((maxL / (ranges - 1)) * (i + 1)) - 1) + "]: " + intervals.get(i));
+            }
+        }
+    }
+
 }

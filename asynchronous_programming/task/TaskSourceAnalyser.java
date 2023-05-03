@@ -8,18 +8,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 public class TaskSourceAnalyser extends AbstractSourceAnalyser {
     ExecutorService executor;
-    CountDownLatch latch;
+    Queue<Future<?>> futureList;
 
     public TaskSourceAnalyser() {
         executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        latch = new CountDownLatch(1);
     }
 
     @Override
@@ -28,27 +25,25 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
                           final int maxL,
                           final int numTopFiles) throws InterruptedException {
         this.setParameters(directory, ranges, maxL, numTopFiles);
-        fileSearch(directory);
-        if (latch.getCount() > 0 && executor.submit(() -> latch.countDown()).isDone()) {
-            latch.await();
+        futureList = new LinkedBlockingQueue<>();
+        futureList.add(executor.submit(() -> {
+            fileSearch(directory);
+        }));
+
+
+        while(futureList.size() > 0) {
+            try {
+                futureList.remove().get(); // get will block until the future is done
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.MINUTES);
 
-        System.out.println("Top Files By Line Count: ");
-        topFiles.forEach(pair -> {
-            System.out.println("First: " + pair.first + " - Second: " + pair.second);
-        });
+        this.printTopFiles(topFiles);
+        this.printIntervals(intervals);
 
-        for (int i = 0; i < ranges; i++) {
-            if (i == 0) {
-                System.out.println("Range [0," + String.valueOf((maxL / (ranges - 1)) - 1) + "]: " + this.intervals.get(i));
-            } else if (i == ranges - 1) {
-                System.out.println("Range [" + String.valueOf(maxL) + ",Infinito]: " + this.intervals.get(i));
-            } else {
-                System.out.println("Range [" + String.valueOf((maxL / (ranges - 1)) * i) + "," + String.valueOf(((maxL / (ranges - 1)) * (i + 1)) - 1) + "]: " + this.intervals.get(i));
-            }
-        }
     }
 
     @Override
@@ -64,20 +59,15 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
         if (files != null) {
             for (File file : files) {
                 if (file.isFile() && file.getName().endsWith(".java")) {
-                    executor.execute(() -> {
+                    futureList.add(executor.submit(() -> {
                         int numLines = this.countLines(file);
                         this.updateIntervals(numLines);
                         this.updateTopFiles(file, numLines);
-                    });
+                    }));
                 } else if (file.isDirectory()) {
-                    /*executor.submit(() -> {
-                        try {
-                         fileSearch(file.getAbsolutePath());
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });*/
-
+                    futureList.add(executor.submit(() -> {
+                        this.fileSearch(file.getAbsolutePath());
+                    }));
                 }
             }
         }
