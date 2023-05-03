@@ -28,7 +28,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
         this.setParameters(directory, ranges, maxL, numTopFiles);
         futureList = new LinkedBlockingQueue<>();
         futureList.add(executor.submit(() -> {
-            fileSearch(directory);
+            fileSearch(directory, false);
         }));
 
 
@@ -40,7 +40,6 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
             }
         }
         executor.shutdown();
-        executor.awaitTermination(1, TimeUnit.MINUTES);
 
         this.printTopFiles(topFiles);
         this.printIntervals(intervals);
@@ -57,7 +56,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
         view.display();
         this.setParameters(directory, ranges, maxL, numTopFiles);
         futureList = new LinkedBlockingQueue<>();
-        futureList.add(executor.submit(() -> fileSearchWithUpdate(directory)));
+        futureList.add(executor.submit(() -> fileSearch(directory, true)));
 
 
         while(futureList.size() > 0) {
@@ -68,11 +67,9 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
             }
         }
         executor.shutdown();
-        //executor.awaitTermination(1, TimeUnit.MINUTES);
-        this.printIntervals(intervals);
     }
 
-    private void fileSearch(String directory) {
+    private void fileSearch(String directory, boolean updateGUI) {
         File[] files = new File(directory).listFiles();
         if (files != null) {
             for (File file : files) {
@@ -81,32 +78,14 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
                         int numLines = this.countLines(file);
                         this.updateIntervals(numLines);
                         this.updateTopFiles(file, numLines);
-                    }));
-                } else if (file.isDirectory()) {
-                    futureList.add(executor.submit(() -> {
-                        this.fileSearch(file.getAbsolutePath());
-                    }));
-                }
-            }
-        }
-    }
+                        if(updateGUI) {
+                            futureList.add(executor.submit(() -> view.update(intervals, topFiles, ranges, maxL)));
+                        }
 
-    private void fileSearchWithUpdate(String directory) {
-        File[] files = new File(directory).listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile() && file.getName().endsWith(".java")) {
-                    futureList.add(executor.submit(() -> {
-                        int numLines = this.countLines(file);
-                        this.updateIntervals(numLines);
-                        this.updateTopFiles(file, numLines);
-                        futureList.add(executor.submit(() -> {
-                            view.update(intervals, topFiles, ranges, maxL);
-                        }));
                     }));
                 } else if (file.isDirectory()) {
                     futureList.add(executor.submit(() -> {
-                        this.fileSearchWithUpdate(file.getAbsolutePath());
+                        this.fileSearch(file.getAbsolutePath(), updateGUI);
                     }));
                 }
             }
