@@ -20,7 +20,7 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
     private int ranges;
     private int maxL;
     private int numTopFiles;
-    private AnalyserView view;
+    protected AnalyserView view;
 
     public AbstractSourceAnalyser() {
         this.intervals = new ArrayList<>();
@@ -35,7 +35,7 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
     abstract public void analyzeSources(final String directory,
                                         final int ranges,
                                         final int maxL,
-                                        final int numTopFile);
+                                        final int numTopFile) throws InterruptedException;
 
     private void startGUI(int width, int height, InputListener listener){
         this.view = new AnalyserView(width, height);
@@ -61,7 +61,7 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                numLines++;
+                numLines = numLines + 1;
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -173,7 +173,6 @@ public class ViewFrame extends JFrame implements ActionListener {
             int maxL = numMaxL;
 
             synchronized (intervals) {
-
                 for (int i = 0; i < intervals.size(); i++) {
                     String tmp;
                     if (i == 0) {
@@ -187,6 +186,5 @@ public class ViewFrame extends JFrame implements ActionListener {
                 }
             }
         }
-
     }
 }
