@@ -7,11 +7,11 @@ import java.io.File;
 import java.util.Queue;
 import java.util.concurrent.*;
 
-public class TaskSourceAnalyser extends AbstractSourceAnalyser {
+public class VirtualSourceAnalyser extends AbstractSourceAnalyser {
     ExecutorService executor;
     Queue<Future<?>> futureList;
 
-    public TaskSourceAnalyser() {
+    public VirtualSourceAnalyser() {
         executor = Executors.newVirtualThreadPerTaskExecutor();
     }
 
