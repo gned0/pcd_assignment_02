@@ -1,14 +1,9 @@
-package task;
+package taskExecutor;
 
 import main.AbstractSourceAnalyser;
-import main.utility.Pair;
 import main.view.AnalyserView;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
 
