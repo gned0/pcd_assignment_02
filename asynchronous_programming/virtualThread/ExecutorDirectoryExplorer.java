@@ -1,9 +1,12 @@
-package taskExecutor;
+package virtualThread;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -13,10 +16,9 @@ public class ExecutorDirectoryExplorer {
         String directoryPath = "input";
         int topN = 10;
 
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
         List<FileLength> fileLengths = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(1);
         Queue<Future<?>> futureList = new LinkedBlockingQueue<>();
 
         futureList.add(executor.submit(() -> {
@@ -32,9 +34,6 @@ public class ExecutorDirectoryExplorer {
             }
         }
 
-//        if (latch.getCount() > 0 && executor.submit(() -> latch.countDown()).isDone()) {
-//            latch.await();
-//        }
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.MINUTES);
 

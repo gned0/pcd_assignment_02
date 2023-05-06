@@ -1,4 +1,4 @@
-package taskExecutor;
+package virtualThread;
 
 import main.AbstractSourceAnalyser;
 import main.view.AnalyserView;
@@ -12,7 +12,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
     Queue<Future<?>> futureList;
 
     public TaskSourceAnalyser() {
-        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        executor = Executors.newVirtualThreadPerTaskExecutor();
     }
 
     @Override

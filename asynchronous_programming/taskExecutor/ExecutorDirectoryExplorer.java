@@ -16,13 +16,11 @@ public class ExecutorDirectoryExplorer {
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         List<FileLength> fileLengths = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(1);
         Queue<Future<?>> futureList = new LinkedBlockingQueue<>();
 
         futureList.add(executor.submit(() -> {
             searchForFiles(new File(directoryPath), fileLengths, executor, futureList);
         }));
-
 
         while(futureList.size() > 0) {
             try {
@@ -32,9 +30,6 @@ public class ExecutorDirectoryExplorer {
             }
         }
 
-//        if (latch.getCount() > 0 && executor.submit(() -> latch.countDown()).isDone()) {
-//            latch.await();
-//        }
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.MINUTES);
 
