@@ -3,7 +3,6 @@ package main.view;
 import main.InputListener;
 import main.utility.Pair;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AnalyserView {

@@ -10,7 +10,7 @@ import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-public class ExecutorDirectoryExplorer {
+public class VirtualThreadDirectoryExplorer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         String directoryPath = "input";

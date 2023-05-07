@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/pcd_assignment_02.iml" filepath="$PROJECT_DIR$/.idea/pcd_assignment_02.iml" />
-      <module fileurl="file://$PROJECT_DIR$/asynchronous_programming/src.iml" filepath="$PROJECT_DIR$/asynchronous_programming/src.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asynchronous_programming/pcd_assignment_02.asynchronous_programming.main.iml" filepath="$PROJECT_DIR$/.idea/modules/asynchronous_programming/pcd_assignment_02.asynchronous_programming.main.iml" />
     </modules>
   </component>
 </project>
