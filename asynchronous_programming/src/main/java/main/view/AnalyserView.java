@@ -25,7 +25,6 @@ public class AnalyserView {
         // updates distribution graph and top files
         this.frame.updateTopFiles(topFiles);
         this.frame.updateDistributionGraph(intervals, ranges, maxL);
-        System.out.println("ciao");
     }
     public void changeState(final String s){
         this.frame.updateState(s);
