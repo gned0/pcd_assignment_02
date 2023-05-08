@@ -47,7 +47,7 @@ public class VirtualSourceAnalyser extends AbstractSourceAnalyser {
                                final int maxL,
                                final int numTopFiles) throws InterruptedException {
 
-        view = new AnalyserView();
+        view = new AnalyserView(this);
         view.display();
         this.setParameters(directory, ranges, maxL, numTopFiles);
         futureList = new LinkedBlockingQueue<>();
@@ -62,6 +62,11 @@ public class VirtualSourceAnalyser extends AbstractSourceAnalyser {
             }
         }
         executor.shutdown();
+    }
+
+    @Override
+    protected void stopExecution() {
+        executor.shutdownNow();
     }
 
     private void fileSearch(String directory, boolean updateGUI) {

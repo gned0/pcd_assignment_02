@@ -1,5 +1,6 @@
 package main.view;
 
+import main.AbstractSourceAnalyser;
 import main.InputListener;
 import main.utility.Pair;
 
@@ -8,8 +9,8 @@ import java.util.List;
 public class AnalyserView {
     private final ViewFrame frame;
 
-    public AnalyserView(){ this.frame = new ViewFrame(900, 400); }
-    public AnalyserView(final int w, final int h){ this.frame = new ViewFrame(w, h); }
+    public AnalyserView(AbstractSourceAnalyser analyser){ this.frame = new ViewFrame(900, 400, analyser); }
+    public AnalyserView(final int w, final int h, AbstractSourceAnalyser analyser){ this.frame = new ViewFrame(w, h, analyser); }
     public void display() {
         javax.swing.SwingUtilities.invokeLater(() -> {
             this.frame.setVisible(true);

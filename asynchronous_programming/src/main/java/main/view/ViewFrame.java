@@ -1,5 +1,6 @@
 package main.view;
 
+import main.AbstractSourceAnalyser;
 import main.InputListener;
 import main.utility.Pair;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class ViewFrame extends JFrame implements ActionListener {
 
+    private final AbstractSourceAnalyser analyser;
     private final JTextField directory;
     private final JTextField intervals;
     private final JTextField maxL;
@@ -25,8 +27,9 @@ public class ViewFrame extends JFrame implements ActionListener {
     private final ExplorationPanel expPanel;
     private final ArrayList<InputListener> listeners;
 
-    public ViewFrame(int w, int h){
+    public ViewFrame(int w, int h, AbstractSourceAnalyser analyser){
         super("Directory Explorer");
+        this.analyser = analyser;
         setSize(w,h);
         listeners = new ArrayList<>();
         directory = new JTextField(5);
