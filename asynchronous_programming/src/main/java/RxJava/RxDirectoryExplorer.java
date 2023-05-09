@@ -2,15 +2,13 @@ package RxJava;
 
 import io.reactivex.rxjava3.core.*;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import main.utility.Pair;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class RxDirectoryExplorer {
@@ -18,7 +16,7 @@ public class RxDirectoryExplorer {
     private static final int TOP_N = 10;
     static int ranges = 5;
     static int maxL = 150;
-    static List<Integer> intervals = new ArrayList<>();
+    static final List<Integer> intervals = new ArrayList<>();
     public static void main(String[] args) throws IOException, InterruptedException {
         String directoryPath = "input";
         for(int i = 0; i < ranges; i++) {
@@ -26,25 +24,29 @@ public class RxDirectoryExplorer {
         }
         File directory = new File(directoryPath);
 
-        Map<Path, Long> fileLines = new HashMap<>();
+        /* GIAN LUCA: I don't think one can implement a solution with side effects that can
+        also update the GUI. Also this current implementation uses side effects to update the
+        intervals data structure. It works fine but as far as I know it is not ideal reactive/
+        streams practice. This implementation does have concurrency in the IO operations though
+        computations are still single threaded.
+         */
 
 
-        Flowable<Path> paths = Flowable.fromArray(directory.listFiles())
+        Flowable.fromArray(directory.listFiles())
                 .flatMap(file -> file.isDirectory()
                         ? Flowable.just(file.toPath()).subscribeOn(Schedulers.io())
                         .flatMap(path -> Flowable.fromIterable(listFiles(path)))
                         : Flowable.just(file.toPath()).subscribeOn(Schedulers.io()))
                 .filter(path -> path.toString().endsWith(".java"))
-                .doOnNext(path -> fileLines.put(path, countLines(path)))
-                .doOnNext(path -> updateIntervals((int) countLines(path)));
-
-        paths
-                .sorted((path1, path2) -> Long.compare(fileLines.get(path2), fileLines.get(path1)))
+                .flatMap(path -> Flowable.fromCallable(() -> countLines(path))
+                .map(lines -> new Pair<>(path, lines)))
+                .doOnNext(file -> updateIntervals(Math.toIntExact(file.second)))
+                .sorted(Comparator.comparing(pair -> pair.second, Comparator.reverseOrder()))
                 .take(TOP_N)
                 .toList()
-                .blockingSubscribe(pathsList -> {
+                .blockingSubscribe(topFiles -> {
                     System.out.println("Files with the most lines of code:");
-                    pathsList.stream().forEach(p -> System.out.println(p.toString() + " " + fileLines.get(p)));
+                    topFiles.forEach(pair -> System.out.println(pair.first.getFileName() + " " +  pair.second.toString()));
                     System.out.println();
                 }, Throwable::printStackTrace);
 
@@ -99,4 +101,9 @@ public class RxDirectoryExplorer {
             }
         }
     }
+
+    static private void log(String msg) {
+        System.out.println("[" + Thread.currentThread().getName() + "] " + msg);
+    }
+
 }
