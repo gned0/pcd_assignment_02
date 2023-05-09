@@ -39,6 +39,7 @@ public class RxDirectoryExplorer {
                         : Flowable.just(file.toPath()).subscribeOn(Schedulers.io()))
                 .filter(path -> path.toString().endsWith(".java"))
                 .flatMap(path -> Flowable.fromCallable(() -> countLines(path))
+                        .subscribeOn(Schedulers.computation())
                 .map(lines -> new Pair<>(path, lines)))
                 .doOnNext(file -> updateIntervals(Math.toIntExact(file.second)))
                 .sorted(Comparator.comparing(pair -> pair.second, Comparator.reverseOrder()))
