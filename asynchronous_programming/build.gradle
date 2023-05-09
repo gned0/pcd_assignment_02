@@ -24,10 +24,14 @@ dependencies {
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:31.1-jre'
 
+    // vertx
     implementation("io.vertx:vertx-core:4.4.1")
     implementation("io.vertx:vertx-web:4.4.1")
     implementation("io.vertx:vertx-web-client:4.4.1")
     implementation group: 'io.netty', name: 'netty-handler', version: '4.1.90.Final'
+
+    // RxJava
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.4'
 }
 
 application {
