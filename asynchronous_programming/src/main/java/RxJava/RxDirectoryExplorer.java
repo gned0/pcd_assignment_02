@@ -27,8 +27,7 @@ public class RxDirectoryExplorer {
         /* GIAN LUCA: I don't think one can implement a solution with side effects that can
         also update the GUI. Also this current implementation uses side effects to update the
         intervals data structure. It works fine but as far as I know it is not ideal reactive/
-        streams practice. This implementation does have concurrency in the IO operations though
-        computations are still single threaded.
+        streams practice.
          */
 
 
