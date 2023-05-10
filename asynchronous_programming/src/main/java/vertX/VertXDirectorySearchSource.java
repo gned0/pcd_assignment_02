@@ -1,24 +1,23 @@
 package vertX;
 
-import io.vertx.core.*;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.file.FileSystem;
-import vertX.test.VertXDirectoryExplorer;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
-public class VertXDirectorySearch extends AbstractVerticle {
+public class VertXDirectorySearchSource extends AbstractVerticle {
 
     private String directoryPath;
     private Queue<Future> listFutures;
     private FileSystem fs;
     private EventBus eb;
 
-    public VertXDirectorySearch(final Queue<Future> listFutures, final String directoryPath) {
+    public VertXDirectorySearchSource(final Queue<Future> listFutures, final String directoryPath) {
         this.listFutures = listFutures;
         this.directoryPath = directoryPath;
     }

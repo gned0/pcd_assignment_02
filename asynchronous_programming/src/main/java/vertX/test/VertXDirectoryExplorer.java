@@ -3,8 +3,6 @@ package vertX.test;
 ;
 import io.vertx.core.*;
 import vertX.FileLength;
-import vertX.VertXDirectorySearch;
-import vertX.VertXFileRead;
 
 import java.util.ArrayList;
 import java.util.Comparator;

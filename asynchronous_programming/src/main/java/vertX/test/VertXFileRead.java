@@ -1,4 +1,4 @@
-package vertX;
+package vertX.test;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
@@ -6,6 +6,7 @@ import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.file.FileSystem;
+import vertX.FileLength;
 import vertX.test.VertXDirectoryExplorer;
 
 import java.io.File;
