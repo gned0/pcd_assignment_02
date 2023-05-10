@@ -62,11 +62,13 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
             }
         }
         executor.shutdown();
+        view.changeState("Done");
     }
 
     @Override
-    protected void stopExecution() {
+    public void stopExecution() {
         executor.shutdownNow();
+        view.changeState("Stopped");
     }
 
     private void fileSearch(String directory, boolean updateGUI) {

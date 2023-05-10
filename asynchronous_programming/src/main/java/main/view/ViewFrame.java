@@ -111,16 +111,14 @@ public class ViewFrame extends JFrame implements ActionListener {
         int numTopFiles = Integer.parseInt(nTopFiles.getText());
         this.numRanges = i;
         this.numMaxL = ml;
-
+        this.updateState("Running");
         for (InputListener l: listeners){
             l.started(d, i , ml, numTopFiles);
         }
     }
 
     private void notifyStopped(){
-        for (InputListener l: listeners){
-            l.stopped();
-        }
+        this.analyser.stopExecution();
     }
 
     public void updateTopFiles(final List<Pair<String, Integer>> topFiles){

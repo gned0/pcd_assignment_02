@@ -63,15 +63,13 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                     updateTopFiles(file.first.toFile(), file.second);
                     view.update(intervals, topFiles, ranges, maxL);
                 })
-                .blockingSubscribe();
-
-
+                .blockingSubscribe(f -> view.changeState("Done"));
 
     }
 
     @Override
-    protected void stopExecution() {
-
+    public void stopExecution() {
+        view.changeState("Stopped");
     }
 
     private List<Path> listFiles(Path path) {

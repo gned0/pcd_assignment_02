@@ -35,7 +35,7 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
                                         final int maxL,
                                         final int numTopFile) throws InterruptedException;
 
-    abstract protected void stopExecution();
+    public abstract void stopExecution();
 
     private void startGUI(int width, int height, InputListener listener){
         this.view = new AnalyserView(width, height, this);
