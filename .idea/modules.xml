@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/pcd_assignment_02.iml" filepath="$PROJECT_DIR$/.idea/modules/pcd_assignment_02.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asynchronous_programming/pcd_assignment_02.asynchronous_programming.iml" filepath="$PROJECT_DIR$/.idea/modules/asynchronous_programming/pcd_assignment_02.asynchronous_programming.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/asynchronous_programming/pcd_assignment_02.asynchronous_programming.main.iml" filepath="$PROJECT_DIR$/.idea/modules/asynchronous_programming/pcd_assignment_02.asynchronous_programming.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/asynchronous_programming/pcd_assignment_02.asynchronous_programming.test.iml" filepath="$PROJECT_DIR$/.idea/modules/asynchronous_programming/pcd_assignment_02.asynchronous_programming.test.iml" />
     </modules>
   </component>
 </project>

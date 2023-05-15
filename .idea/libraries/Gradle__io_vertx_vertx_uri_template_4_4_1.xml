@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.vertx:vertx-uri-template:4.4.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.vertx" artifactId="vertx-uri-template" version="4.4.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-uri-template/4.4.1/3bdfe7d76218130f804f25aa7c3ace81284ad09b/vertx-uri-template-4.4.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-uri-template/4.4.1/39886a442b61fb47c67145cdd348ac61ca99cd08/vertx-uri-template-4.4.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

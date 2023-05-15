@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.vertx:vertx-core:4.4.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.vertx" artifactId="vertx-core" version="4.4.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-core/4.4.1/b273a9fd14ebb234c208bf6be08e8cea9a823d0a/vertx-core-4.4.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.vertx/vertx-core/4.4.1/d65a6fc5dcb063376a9a10e18633e1fbbbb22f8c/vertx-core-4.4.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
