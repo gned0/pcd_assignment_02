@@ -23,4 +23,7 @@
 hs_err_pid*
 replay_pid*
 
+# adding auto-generated directories from IDEA
 asynchronous_programming\build
+.idea
+.gradle

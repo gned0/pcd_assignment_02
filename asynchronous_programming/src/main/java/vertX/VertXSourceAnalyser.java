@@ -7,8 +7,6 @@ import io.vertx.core.VertxOptions;
 import io.vertx.core.file.FileSystem;
 import main.AbstractSourceAnalyser;
 import main.view.AnalyserView;
-import vertX.test.VertXDirectorySearch;
-import vertX.test.VertXFileRead;
 
 import java.io.File;
 import java.util.List;
@@ -23,7 +21,8 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
 
     public VertXSourceAnalyser() {
         vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(Runtime.getRuntime().availableProcessors()));
-        futureList = new LinkedBlockingQueue<>();
+        fs = vertx.fileSystem();
+        listFutures = new LinkedBlockingQueue<>();
     }
 
     @Override
@@ -33,11 +32,8 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
                           final int numTopFiles) throws InterruptedException {
         this.setParameters(directory, ranges, maxL, numTopFiles);
 
-        vertx = Vertx.vertx();
-        fs = vertx.fileSystem();
-
         listFutures.add(Future.future(promise -> {
-            fileSearch(directoryPath, listFutures, fileLengths);
+            fileSearch(directory, false);
             promise.complete();
         }));
 
@@ -47,7 +43,7 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
 
         this.printTopFiles(topFiles);
         this.printIntervals(intervals);
-
+        vertx.close();
     }
 
     @Override
@@ -59,13 +55,13 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
         view = new AnalyserView(this);
         view.display();
         this.setParameters(directory, ranges, maxL, numTopFiles);
-        futureList.add(vertx.deployVerticle(new VertXDirectorySearchSource(futureList, directory)));
-        futureList.add(vertx.deployVerticle(new VertXFileReadSource(futureList,
-                view, true, intervals, topFiles, ranges, maxL, numTopFiles)));
+        listFutures.add(Future.future(promise -> {
+            fileSearch(directory, true);
+            promise.complete();
+        }));
 
-
-        while(futureList.size() > 0) {
-            futureList.remove().toCompletionStage().toCompletableFuture().join();
+        while(listFutures.size() > 0) {
+            listFutures.remove().toCompletionStage().toCompletableFuture().join();
         }
 
         vertx.close();
@@ -95,7 +91,6 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
                             promiseGUI.complete();
                         }));
                     }
-
                 }));
             } else if (file.isDirectory()) {
                 listFutures.add(Future.future(promise -> {
