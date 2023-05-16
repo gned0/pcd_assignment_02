@@ -1,25 +1,32 @@
 package RxJava;
 
 import io.reactivex.rxjava3.core.Flowable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Predicate;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import main.AbstractSourceAnalyser;
 import main.utility.Pair;
 import main.view.AnalyserView;
 
+import javax.swing.plaf.TableHeaderUI;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class RxSourceAnalyser extends AbstractSourceAnalyser {
+
+    private boolean isCancelled = false;
 
     @Override
     public void getReport(String directory, int ranges, int maxL, int numTopFiles) {
         this.setParameters(directory, ranges, maxL, numTopFiles);
         File startFile = new File(directory);
+
         Flowable.fromArray(startFile.listFiles())
                 .flatMap(file -> file.isDirectory()
                         ? Flowable.just(file.toPath()).subscribeOn(Schedulers.io())
@@ -54,6 +61,11 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                         ? Flowable.just(file.toPath()).subscribeOn(Schedulers.io())
                         .flatMap(path -> Flowable.fromIterable(listFiles(path)))
                         : Flowable.just(file.toPath()).subscribeOn(Schedulers.io()))
+                .takeUntil(f -> {
+                    synchronized (this) {
+                        return isCancelled;
+                    }
+                })
                 .filter(path -> path.toString().endsWith(".java"))
                 .flatMap(path -> Flowable.fromCallable(() -> countLines(path))
                         .subscribeOn(Schedulers.computation())
@@ -63,12 +75,18 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                     updateTopFiles(file.first.toFile(), file.second);
                     view.update(intervals, topFiles, ranges, maxL);
                 })
-                .blockingSubscribe(f -> view.changeState("Done"));
+                .blockingSubscribe();
+
+        view.changeState("Done");
 
     }
 
     @Override
     public void stopExecution() {
+
+        synchronized (this) {
+            isCancelled = true;
+        }
         view.changeState("Stopped");
     }
 

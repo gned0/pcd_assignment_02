@@ -15,13 +15,8 @@ import java.util.List;
 public class ViewFrame extends JFrame implements ActionListener {
 
     private final AbstractSourceAnalyser analyser;
-    private final JTextField directory;
-    private final JTextField intervals;
-    private final JTextField maxL;
     private final JTextField state;
-    private final JTextField nTopFiles;
     private JFileChooser directoryChooser;
-    private final JButton directoryButton;
     private static int numRanges;
     private static int numMaxL;
     private final ExplorationPanel expPanel;
@@ -32,27 +27,9 @@ public class ViewFrame extends JFrame implements ActionListener {
         this.analyser = analyser;
         setSize(w,h);
         listeners = new ArrayList<>();
-        directory = new JTextField(5);
-        intervals = new JTextField(5);
-        maxL = new JTextField(5);
-        nTopFiles = new JTextField(5);
 
-        JButton startButton = new JButton("start");
         JButton stopButton = new JButton("stop");
         JPanel controlPanel = new JPanel();
-        controlPanel.add(new JLabel("Directory: "));
-        controlPanel.add(directory);
-        directoryButton = new JButton("Browse");
-        controlPanel.add(directoryButton);
-
-        controlPanel.add(new JLabel("N Top Files"));
-        controlPanel.add(nTopFiles);
-
-        controlPanel.add(new JLabel("Number of intervals: "));
-        controlPanel.add(intervals);
-        controlPanel.add(new JLabel("Max lines: "));
-        controlPanel.add(maxL);
-        controlPanel.add(startButton);
         controlPanel.add(stopButton);
 
         expPanel = new ExplorationPanel();
@@ -72,9 +49,7 @@ public class ViewFrame extends JFrame implements ActionListener {
         cp.add(BorderLayout.SOUTH, infoPanel);
         setContentPane(cp);
 
-        startButton.addActionListener(this);
         stopButton.addActionListener(this);
-        directoryButton.addActionListener(this);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
@@ -84,19 +59,8 @@ public class ViewFrame extends JFrame implements ActionListener {
 
     public void actionPerformed(final ActionEvent ev){
         String cmd = ev.getActionCommand();
-        if (cmd.equals("start")){
-            notifyStarted();
-        } else if (cmd.equals("stop")){
+        if (cmd.equals("stop")){
             notifyStopped();
-        } else if(cmd.equals("Browse")){
-            directoryChooser = new JFileChooser(".");
-            directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int status = directoryChooser.showSaveDialog(null);
-
-            if(status == JFileChooser.APPROVE_OPTION){
-                String path = directoryChooser.getSelectedFile().getAbsolutePath();
-                directory.setText(path);
-            }
         }
     }
 
@@ -104,18 +68,7 @@ public class ViewFrame extends JFrame implements ActionListener {
         listeners.add(l);
     }
 
-    private void notifyStarted(){
-        String d = directory.getText();
-        int i = Integer.parseInt(intervals.getText());
-        int ml = Integer.parseInt(maxL.getText());
-        int numTopFiles = Integer.parseInt(nTopFiles.getText());
-        this.numRanges = i;
-        this.numMaxL = ml;
-        this.updateState("Running");
-        for (InputListener l: listeners){
-            l.started(d, i , ml, numTopFiles);
-        }
-    }
+
 
     private void notifyStopped(){
         this.analyser.stopExecution();
