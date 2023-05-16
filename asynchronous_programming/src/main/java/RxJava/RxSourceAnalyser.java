@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,6 +26,7 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
 
     @Override
     public void getReport(String directory, int ranges, int maxL, int numTopFiles) {
+        Instant start = Instant.now();
         this.setParameters(directory, ranges, maxL, numTopFiles);
         File startFile = new File(directory);
 
@@ -46,13 +49,17 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                     printIntervals(intervals);
                 }, Throwable::printStackTrace);
 
+        Instant end = Instant.now();
+        System.out.println("Completed in " + Duration.between(start, end).toMillis() + " ms");
+
     }
 
     @Override
     public void analyzeSources(String directory, int ranges, int maxL, int numTopFiles) {
-
+        Instant start = Instant.now();
         view = new AnalyserView(this);
         view.display();
+        view.changeState("Running");
         this.setParameters(directory, ranges, maxL, numTopFiles);
         File startFile = new File(directory);
 
@@ -76,8 +83,8 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                     view.update(intervals, topFiles, ranges, maxL);
                 })
                 .blockingSubscribe();
-
-        view.changeState("Done");
+        Instant end = Instant.now();
+        view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
 
     }
 

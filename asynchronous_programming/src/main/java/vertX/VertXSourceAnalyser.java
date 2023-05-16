@@ -9,6 +9,8 @@ import main.AbstractSourceAnalyser;
 import main.view.AnalyserView;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -29,9 +31,8 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
                           final int ranges,
                           final int maxL,
                           final int numTopFiles) throws InterruptedException {
+        Instant start = Instant.now();
         this.setParameters(directory, ranges, maxL, numTopFiles);
-
-
         listFutures.add(Future.future(promise -> {
             fileSearch(directory, false);
             promise.complete();
@@ -44,7 +45,8 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
         this.printTopFiles(topFiles);
         this.printIntervals(intervals);
         vertx.close();
-    }
+        Instant end = Instant.now();
+        System.out.println("Completed in " + Duration.between(start, end).toMillis() + " ms");    }
 
     @Override
     public void analyzeSources(final String directory,
@@ -52,8 +54,10 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
                                final int maxL,
                                final int numTopFiles) throws InterruptedException {
 
+        Instant start = Instant.now();
         view = new AnalyserView(this);
         view.display();
+        view.changeState("Running");
         this.setParameters(directory, ranges, maxL, numTopFiles);
         listFutures.add(Future.future(promise -> {
             fileSearch(directory, true);
@@ -65,7 +69,8 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
         }
 
         vertx.close();
-        view.changeState("Done");
+        Instant end = Instant.now();
+        view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
     }
 
     @Override
