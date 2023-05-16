@@ -11,7 +11,6 @@ import main.view.AnalyserView;
 import java.io.File;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class VertXSourceAnalyser extends AbstractSourceAnalyser {
@@ -31,6 +30,7 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
                           final int maxL,
                           final int numTopFiles) throws InterruptedException {
         this.setParameters(directory, ranges, maxL, numTopFiles);
+
 
         listFutures.add(Future.future(promise -> {
             fileSearch(directory, false);
@@ -57,7 +57,7 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
         this.setParameters(directory, ranges, maxL, numTopFiles);
         listFutures.add(Future.future(promise -> {
             fileSearch(directory, true);
-            promise.complete();
+            promise.complete("Init Job");
         }));
 
         while(listFutures.size() > 0) {
@@ -88,14 +88,15 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
                     if(updateGUI) {
                         listFutures.add(Future.future(promiseGUI -> {
                             view.update(intervals, topFiles, ranges, maxL);
-                            promiseGUI.complete();
+                            promiseGUI.complete("GUI Updated");
                         }));
                     }
+                    promise.complete("File Read Job");
                 }));
             } else if (file.isDirectory()) {
                 listFutures.add(Future.future(promise -> {
                     this.fileSearch(file.getAbsolutePath(), updateGUI);
-                    promise.complete();
+                    promise.complete("Recursive Directory Search");
                 }));
             }
         }));
