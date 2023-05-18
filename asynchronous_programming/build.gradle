@@ -36,7 +36,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass = 'asynchronous_programming'
+    mainClass = 'main.AnalyserDemo'
 }
 
 tasks.named('test') {

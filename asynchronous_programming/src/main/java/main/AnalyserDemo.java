@@ -7,14 +7,15 @@ import virtualThread.VirtualSourceAnalyser;
 
 import java.util.Scanner;
 
-public class TestReport {
+public class AnalyserDemo {
 
     private static String directory;
     private static int ranges;
     private static int maxL;
     private static int numTopFiles;
     private static SourceAnalyser analyser = null;
-    private static int selectedOption = -1;
+    private static int selectedAnalyser = -1;
+    private static int selectedMethod = -1;
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -27,21 +28,21 @@ public class TestReport {
         numTopFiles = Integer.parseInt(args[3]);
 
         Scanner scanner = new Scanner(System.in);
-        while (selectedOption < 1 || selectedOption > 4) {
+        while (selectedAnalyser < 1 || selectedAnalyser > 4) {
             System.out.println("Choose analyser to test (1 to 4): ");
             System.out.println("1. Executor Service");
             System.out.println("2. Virtual Thread");
             System.out.println("3. VertX");
             System.out.println("4. RxJava");
             if (scanner.hasNextInt()) {
-                selectedOption = scanner.nextInt();
+                selectedAnalyser = scanner.nextInt();
             } else {
                 scanner.nextLine(); // Discard invalid input
             }
         }
         scanner.close();
 
-        switch (selectedOption) {
+        switch (selectedAnalyser) {
             case 1:
                 analyser = new TaskSourceAnalyser();
                 break;
@@ -56,7 +57,28 @@ public class TestReport {
                 break;
         }
 
-        analyser.getReport(directory, ranges, maxL, numTopFiles);
+        scanner = new Scanner(System.in);
+        while (selectedMethod < 1 || selectedMethod > 2) {
+            System.out.println("Choose method to test (1 to 2): ");
+            System.out.println("1. getReport()");
+            System.out.println("2. analyzeSources()");
+            if (scanner.hasNextInt()) {
+                selectedMethod = scanner.nextInt();
+            } else {
+                scanner.nextLine(); // Discard invalid input
+            }
+        }
+        scanner.close();
+
+        switch (selectedAnalyser) {
+            case 1:
+                analyser.getReport(directory, ranges, maxL, numTopFiles);
+                break;
+            case 2:
+                analyser.analyzeSources(directory, ranges, maxL, numTopFiles);
+                break;
+        }
+
 
     }
 

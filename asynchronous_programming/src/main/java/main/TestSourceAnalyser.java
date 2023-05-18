@@ -10,9 +10,9 @@ public class TestSourceAnalyser {
 
     public static void main(String[] args) throws InterruptedException {
 
-        SourceAnalyser test = new VertXSourceAnalyser();
-//        test.analyzeSources("input", 5, 150, 10);
-        test.getReport("input", 5, 150, 10);
+        SourceAnalyser test = new TaskSourceAnalyser();
+        test.analyzeSources("input", 5, 150, 10);
+        // test.getReport("input", 5, 150, 10);
 
     }
 
