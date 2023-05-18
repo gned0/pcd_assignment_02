@@ -106,10 +106,19 @@ public class ViewFrame extends JFrame implements ActionListener {
 
 
     private void startSearch() {
-        this.analyser.startPressed(directory.getText(),
-                Integer.parseInt(intervals.getText()),
-                Integer.parseInt(maxL.getText()),
-                Integer.parseInt(nTopFiles.getText()));
+        String dir = directory.getText();
+        String interv = intervals.getText();
+        String max = maxL.getText();
+        String topFiles = nTopFiles.getText();
+
+        if(dir.equals("") || interv.equals("") || max.equals("") || topFiles.equals("")){
+            updateState("Fill out all fields!");
+        } else {
+            this.analyser.startPressed(directory.getText(),
+                    Integer.parseInt(intervals.getText()),
+                    Integer.parseInt(maxL.getText()),
+                    Integer.parseInt(nTopFiles.getText()));
+        }
     }
 
     private void notifyStopped(){
