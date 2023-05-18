@@ -37,6 +37,13 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
 
     public abstract void stopExecution();
 
+    public abstract void waitStart();
+
+    public abstract void startPressed(final String directory,
+                                      final int ranges,
+                                      final int maxL,
+                                      final int numTopFile);
+
     private void startGUI(int width, int height, InputListener listener){
         this.view = new AnalyserView(width, height, this);
         this.view.addListener(listener);
@@ -81,6 +88,10 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
         }
     }
 
+    protected void resetTopFiles() {
+        topFiles.clear();
+    }
+
     protected void updateIntervals(final int numLines) {
         synchronized (intervals) {
             for (int i = ranges - 1; i >= 0; i--) {
@@ -92,6 +103,13 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
                     break;
                 }
             }
+        }
+    }
+
+    protected void resetIntervals() {
+        intervals.clear();
+        for(int i = 0; i < ranges; i++) {
+            this.intervals.add(i, 0);
         }
     }
 

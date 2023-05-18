@@ -1,4 +1,4 @@
-package RxJava;
+package rxJava;
 
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -56,36 +56,42 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
 
     @Override
     public void analyzeSources(String directory, int ranges, int maxL, int numTopFiles) {
-        Instant start = Instant.now();
         view = new AnalyserView(this);
         view.display();
         view.changeState("Running");
         this.setParameters(directory, ranges, maxL, numTopFiles);
-        File startFile = new File(directory);
 
-        Flowable.fromArray(startFile.listFiles())
-                .flatMap(file -> file.isDirectory()
-                        ? Flowable.just(file.toPath()).subscribeOn(Schedulers.io())
-                        .flatMap(path -> Flowable.fromIterable(listFiles(path)))
-                        : Flowable.just(file.toPath()).subscribeOn(Schedulers.io()))
-                .takeUntil(f -> {
-                    synchronized (this) {
-                        return isCancelled;
-                    }
-                })
-                .filter(path -> path.toString().endsWith(".java"))
-                .flatMap(path -> Flowable.fromCallable(() -> countLines(path))
-                        .subscribeOn(Schedulers.computation())
-                        .map(lines -> new Pair<>(path, lines)))
-                .doOnNext(file -> {
-                    updateIntervals(file.second);
-                    updateTopFiles(file.first.toFile(), file.second);
-                    view.update(intervals, topFiles, ranges, maxL);
-                })
-                .blockingSubscribe();
-        Instant end = Instant.now();
-        view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
+        while(true) {
+            isCancelled = false;
+            waitStart();
 
+            Instant start = Instant.now();
+            File startFile = new File(initialDirectory);
+
+            Flowable.fromArray(startFile.listFiles())
+                    .flatMap(file -> file.isDirectory()
+                            ? Flowable.just(file.toPath()).subscribeOn(Schedulers.io())
+                            .flatMap(path -> Flowable.fromIterable(listFiles(path)))
+                            : Flowable.just(file.toPath()).subscribeOn(Schedulers.io()))
+                    .takeUntil(f -> {
+                        synchronized (this) {
+                            return isCancelled;
+                        }
+                    })
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .flatMap(path -> Flowable.fromCallable(() -> countLines(path))
+                            .subscribeOn(Schedulers.computation())
+                            .map(lines -> new Pair<>(path, lines)))
+                    .doOnNext(file -> {
+                        updateIntervals(file.second);
+                        updateTopFiles(file.first.toFile(), file.second);
+                        view.update(intervals, topFiles, ranges, maxL);
+                    })
+                    .blockingSubscribe();
+            Instant end = Instant.now();
+            view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
+
+        }
     }
 
     @Override
@@ -96,6 +102,34 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
         }
         view.changeState("Stopped");
     }
+
+    @Override
+    public void waitStart() {
+        synchronized (this) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        resetTopFiles();
+        resetIntervals();
+    }
+
+    @Override
+    public void startPressed(final String directory,
+                             final int ranges,
+                             final int maxL,
+                             final int numTopFile) {
+        this.initialDirectory = directory;
+        this.ranges = ranges;
+        this.maxL = maxL;
+        this.numTopFiles = numTopFile;
+        synchronized (this) {
+            notifyAll();
+        }
+    }
+
 
     private List<Path> listFiles(Path path) {
         try {

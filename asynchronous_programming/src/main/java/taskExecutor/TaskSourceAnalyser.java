@@ -13,9 +13,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
     ExecutorService executor;
     Queue<Future<?>> futureList;
 
-    public TaskSourceAnalyser() {
-        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-    }
+    public TaskSourceAnalyser() {}
 
     @Override
     public void getReport(final String directory,
@@ -24,6 +22,8 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
                           final int numTopFiles) throws InterruptedException {
         Instant start = Instant.now();
         this.setParameters(directory, ranges, maxL, numTopFiles);
+        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         futureList = new LinkedBlockingQueue<>();
         futureList.add(executor.submit(() -> {
             fileSearch(directory, false);
@@ -50,32 +50,65 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
                                final int ranges,
                                final int maxL,
                                final int numTopFiles) throws InterruptedException {
-
-        Instant start = Instant.now();
+        this.setParameters(directory, ranges, maxL, numTopFiles);
         view = new AnalyserView(this);
         view.display();
-        view.changeState("Running");
-        this.setParameters(directory, ranges, maxL, numTopFiles);
-        futureList = new LinkedBlockingQueue<>();
-        futureList.add(executor.submit(() -> fileSearch(directory, true)));
+
+        while(true) {
+            executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+            waitStart();
+
+            Instant start = Instant.now();
+            view.changeState("Running");
+            futureList = new LinkedBlockingQueue<>();
+            futureList.add(executor.submit(() -> fileSearch(initialDirectory, true)));
 
 
-        while(futureList.size() > 0) {
-            try {
-                futureList.remove().get(); // get will block until the future is done
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
+            while (futureList.size() > 0) {
+                try {
+                    futureList.remove().get(); // get will block until the future is done
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
             }
+            executor.shutdown();
+            Instant end = Instant.now();
+            view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
         }
-        executor.shutdown();
-        Instant end = Instant.now();
-        view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
     }
 
     @Override
     public void stopExecution() {
         executor.shutdownNow();
         view.changeState("Stopped");
+    }
+
+    @Override
+    public void waitStart() {
+        synchronized (this) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        resetTopFiles();
+        resetIntervals();
+    }
+
+    @Override
+    public void startPressed(final String directory,
+                             final int ranges,
+                             final int maxL,
+                             final int numTopFile) {
+        this.initialDirectory = directory;
+        this.ranges = ranges;
+        this.maxL = maxL;
+        this.numTopFiles = numTopFile;
+        synchronized (this) {
+            notifyAll();
+        }
     }
 
     private void fileSearch(String directory, boolean updateGUI) {

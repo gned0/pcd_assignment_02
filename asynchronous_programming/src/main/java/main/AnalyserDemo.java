@@ -1,6 +1,6 @@
 package main;
 
-import RxJava.RxSourceAnalyser;
+import rxJava.RxSourceAnalyser;
 import taskExecutor.TaskSourceAnalyser;
 import vertX.VertXSourceAnalyser;
 import virtualThread.VirtualSourceAnalyser;

@@ -21,8 +21,6 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
     Queue<Future> listFutures;
 
     public VertXSourceAnalyser() {
-        vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(Runtime.getRuntime().availableProcessors()));
-        fs = vertx.fileSystem();
         listFutures = new LinkedBlockingQueue<>();
     }
 
@@ -33,6 +31,10 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
                           final int numTopFiles) throws InterruptedException {
         Instant start = Instant.now();
         this.setParameters(directory, ranges, maxL, numTopFiles);
+
+        vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(Runtime.getRuntime().availableProcessors()));
+        fs = vertx.fileSystem();
+
         listFutures.add(Future.future(promise -> {
             fileSearch(directory, false);
             promise.complete();
@@ -53,14 +55,22 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
                                final int ranges,
                                final int maxL,
                                final int numTopFiles) throws InterruptedException {
-
-        Instant start = Instant.now();
+        this.setParameters(directory, ranges, maxL, numTopFiles);
         view = new AnalyserView(this);
         view.display();
+
+
+
+        while(true) {
+        vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(Runtime.getRuntime().availableProcessors()));
+        fs = vertx.fileSystem();
+
+        waitStart();
+
+        Instant start = Instant.now();
         view.changeState("Running");
-        this.setParameters(directory, ranges, maxL, numTopFiles);
         listFutures.add(Future.future(promise -> {
-            fileSearch(directory, true);
+            fileSearch(initialDirectory, true);
             promise.complete("Init Job");
         }));
 
@@ -71,6 +81,8 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
         vertx.close();
         Instant end = Instant.now();
         view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
+        }
+
     }
 
     @Override
@@ -78,6 +90,34 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
         vertx.close();
         view.changeState("Stopped");
     }
+
+    @Override
+    public void waitStart() {
+        synchronized (this) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        resetTopFiles();
+        resetIntervals();
+    }
+
+    @Override
+    public void startPressed(final String directory,
+                             final int ranges,
+                             final int maxL,
+                             final int numTopFile) {
+        this.initialDirectory = directory;
+        this.ranges = ranges;
+        this.maxL = maxL;
+        this.numTopFiles = numTopFile;
+        synchronized (this) {
+            notifyAll();
+        }
+    }
+
 
 
     private void fileSearch(String directory, boolean updateGUI) {
