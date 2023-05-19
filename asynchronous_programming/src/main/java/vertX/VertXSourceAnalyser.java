@@ -62,25 +62,25 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
 
 
         while(true) {
-        vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(Runtime.getRuntime().availableProcessors()));
-        fs = vertx.fileSystem();
+            vertx = Vertx.vertx(new VertxOptions().setWorkerPoolSize(Runtime.getRuntime().availableProcessors()));
+            fs = vertx.fileSystem();
 
-        waitStart();
+            waitStart();
 
-        Instant start = Instant.now();
-        view.changeState("Running");
-        listFutures.add(Future.future(promise -> {
-            fileSearch(initialDirectory, true);
-            promise.complete("Init Job");
-        }));
+            Instant start = Instant.now();
+            view.changeState("Running");
+            listFutures.add(Future.future(promise -> {
+                fileSearch(initialDirectory, true);
+                promise.complete("Init Job");
+            }));
 
-        while(listFutures.size() > 0) {
-            listFutures.remove().toCompletionStage().toCompletableFuture().join();
-        }
+            while(listFutures.size() > 0) {
+                listFutures.remove().toCompletionStage().toCompletableFuture().join();
+            }
 
-        vertx.close();
-        Instant end = Instant.now();
-        view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
+            vertx.close();
+            Instant end = Instant.now();
+            view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
         }
 
     }

@@ -10,7 +10,7 @@ public class TestSourceAnalyser {
 
     public static void main(String[] args) throws InterruptedException {
 
-        SourceAnalyser test = new TaskSourceAnalyser();
+        SourceAnalyser test = new RxSourceAnalyser();
         test.analyzeSources("input", 5, 150, 10);
         // test.getReport("input", 5, 150, 10);
 

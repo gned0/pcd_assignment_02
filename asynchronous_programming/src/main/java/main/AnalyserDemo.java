@@ -36,11 +36,11 @@ public class AnalyserDemo {
             System.out.println("4. RxJava");
             if (scanner.hasNextInt()) {
                 selectedAnalyser = scanner.nextInt();
+                scanner.nextLine();
             } else {
                 scanner.nextLine(); // Discard invalid input
             }
         }
-        scanner.close();
 
         switch (selectedAnalyser) {
             case 1:
@@ -57,20 +57,20 @@ public class AnalyserDemo {
                 break;
         }
 
-        scanner = new Scanner(System.in);
         while (selectedMethod < 1 || selectedMethod > 2) {
             System.out.println("Choose method to test (1 to 2): ");
             System.out.println("1. getReport()");
             System.out.println("2. analyzeSources()");
             if (scanner.hasNextInt()) {
                 selectedMethod = scanner.nextInt();
+                scanner.nextLine();
             } else {
                 scanner.nextLine(); // Discard invalid input
             }
         }
         scanner.close();
 
-        switch (selectedAnalyser) {
+        switch (selectedMethod) {
             case 1:
                 analyser.getReport(directory, ranges, maxL, numTopFiles);
                 break;
