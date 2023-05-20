@@ -1,14 +1,11 @@
 package rxJava;
 
 import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Predicate;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import main.AbstractSourceAnalyser;
 import main.utility.Pair;
 import main.view.AnalyserView;
 
-import javax.swing.plaf.TableHeaderUI;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +14,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class RxSourceAnalyser extends AbstractSourceAnalyser {
@@ -55,11 +51,10 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
     }
 
     @Override
-    public void analyzeSources(String directory, int ranges, int maxL, int numTopFiles) {
+    public void analyzeSources() {
         view = new AnalyserView(this);
         view.display();
         view.changeState("Running");
-        this.setParameters(directory, ranges, maxL, numTopFiles);
 
         while(true) {
             isCancelled = false;

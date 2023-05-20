@@ -28,7 +28,7 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
     public void getReport(final String directory,
                           final int ranges,
                           final int maxL,
-                          final int numTopFiles) throws InterruptedException {
+                          final int numTopFiles) {
         Instant start = Instant.now();
         this.setParameters(directory, ranges, maxL, numTopFiles);
 
@@ -51,11 +51,7 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
         System.out.println("Completed in " + Duration.between(start, end).toMillis() + " ms");    }
 
     @Override
-    public void analyzeSources(final String directory,
-                               final int ranges,
-                               final int maxL,
-                               final int numTopFiles) throws InterruptedException {
-        this.setParameters(directory, ranges, maxL, numTopFiles);
+    public void analyzeSources() {
         view = new AnalyserView(this);
         view.display();
 

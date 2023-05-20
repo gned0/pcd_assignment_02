@@ -4,7 +4,7 @@
     <output-test url="file://$MODULE_DIR$/../../../asynchronous_programming/build/classes/java/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../asynchronous_programming/src/test" />
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="corretto-19" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="pcd_assignment_02.asynchronous_programming.main" />
     <orderEntry type="library" name="Gradle: com.google.guava:guava:31.1-jre" level="project" />

@@ -25,9 +25,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
         executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         futureList = new LinkedBlockingQueue<>();
-        futureList.add(executor.submit(() -> {
-            fileSearch(directory, false);
-        }));
+        futureList.add(executor.submit(() -> fileSearch(directory, false)));
 
 
         while(futureList.size() > 0) {
@@ -46,11 +44,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
     }
 
     @Override
-    public void analyzeSources(final String directory,
-                               final int ranges,
-                               final int maxL,
-                               final int numTopFiles) throws InterruptedException {
-        this.setParameters(directory, ranges, maxL, numTopFiles);
+    public void analyzeSources() throws InterruptedException {
         view = new AnalyserView(this);
         view.display();
 
@@ -126,9 +120,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
 
                     }));
                 } else if (file.isDirectory()) {
-                    futureList.add(executor.submit(() -> {
-                        this.fileSearch(file.getAbsolutePath(), updateGUI);
-                    }));
+                    futureList.add(executor.submit(() -> this.fileSearch(file.getAbsolutePath(), updateGUI)));
                 }
             }
         }

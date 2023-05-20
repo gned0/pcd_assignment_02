@@ -48,11 +48,7 @@ public class VirtualSourceAnalyser extends AbstractSourceAnalyser {
     }
 
     @Override
-    public void analyzeSources(final String directory,
-                               final int ranges,
-                               final int maxL,
-                               final int numTopFiles) throws InterruptedException {
-        this.setParameters(directory, ranges, maxL, numTopFiles);
+    public void analyzeSources() throws InterruptedException {
         view = new AnalyserView(this);
         view.display();
 

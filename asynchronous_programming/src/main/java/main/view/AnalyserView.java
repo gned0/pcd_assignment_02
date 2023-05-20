@@ -1,7 +1,6 @@
 package main.view;
 
 import main.AbstractSourceAnalyser;
-import main.InputListener;
 import main.utility.Pair;
 
 import java.util.List;
@@ -12,13 +11,9 @@ public class AnalyserView {
     public AnalyserView(AbstractSourceAnalyser analyser){ this.frame = new ViewFrame(900, 400, analyser); }
     public AnalyserView(final int w, final int h, AbstractSourceAnalyser analyser){ this.frame = new ViewFrame(w, h, analyser); }
     public void display() {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            this.frame.setVisible(true);
-        });
+        javax.swing.SwingUtilities.invokeLater(() -> this.frame.setVisible(true));
     }
-    public void addListener(final InputListener l){
-        this.frame.addListener(l);
-    }
+
     public void update(final List<Integer> intervals,
                        final List<Pair<String, Integer>> topFiles,
                        final int ranges,

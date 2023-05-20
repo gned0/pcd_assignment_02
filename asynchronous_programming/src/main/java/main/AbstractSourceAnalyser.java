@@ -30,10 +30,7 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
                                    final int maxL,
                                    final int numTopFiles) throws InterruptedException;
 
-    abstract public void analyzeSources(final String directory,
-                                        final int ranges,
-                                        final int maxL,
-                                        final int numTopFile) throws InterruptedException;
+    abstract public void analyzeSources() throws InterruptedException;
 
     public abstract void stopExecution();
 
@@ -43,12 +40,6 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
                                       final int ranges,
                                       final int maxL,
                                       final int numTopFile);
-
-    private void startGUI(int width, int height, InputListener listener){
-        this.view = new AnalyserView(width, height, this);
-        this.view.addListener(listener);
-        this.view.display();
-    }
 
     protected void setParameters(final String directory,
                                  final int ranges,
@@ -66,8 +57,7 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
     protected int countLines(File file) {
         int numLines = 0;
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
+            while (reader.readLine() != null) {
                 numLines = numLines + 1;
             }
         } catch (IOException e) {
@@ -115,9 +105,7 @@ public abstract class AbstractSourceAnalyser implements SourceAnalyser {
 
     protected void printTopFiles(List<Pair<String, Integer>> topFiles) {
         System.out.println("Top Files By Line Count: ");
-        topFiles.forEach(pair -> {
-            System.out.println("File Path: " + pair.first + ", lines: " + pair.second);
-        });
+        topFiles.forEach(pair -> System.out.println("File Path: " + pair.first + ", lines: " + pair.second));
     }
 
     protected void printIntervals(List<Integer> intervals) {

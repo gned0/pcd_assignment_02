@@ -1,15 +1,12 @@
 package main.view;
 
 import main.AbstractSourceAnalyser;
-import main.InputListener;
 import main.utility.Pair;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ViewFrame extends JFrame implements ActionListener {
@@ -20,18 +17,13 @@ public class ViewFrame extends JFrame implements ActionListener {
     private final JTextField maxL;
     private final JTextField state;
     private final JTextField nTopFiles;
-    private JFileChooser directoryChooser;
-    private final JButton directoryButton;
-    private static int numRanges;
-    private static int numMaxL;
+
     private final ExplorationPanel expPanel;
-    private final ArrayList<InputListener> listeners;
 
     public ViewFrame(int w, int h, AbstractSourceAnalyser analyser){
         super("Directory Explorer");
         this.analyser = analyser;
         setSize(w,h);
-        listeners = new ArrayList<>();
         directory = new JTextField(5);
         intervals = new JTextField(5);
         maxL = new JTextField(5);
@@ -42,7 +34,7 @@ public class ViewFrame extends JFrame implements ActionListener {
         JPanel controlPanel = new JPanel();
         controlPanel.add(new JLabel("Directory: "));
         controlPanel.add(directory);
-        directoryButton = new JButton("Browse");
+        JButton directoryButton = new JButton("Browse");
         controlPanel.add(directoryButton);
 
         controlPanel.add(new JLabel("N Top Files"));
@@ -84,24 +76,19 @@ public class ViewFrame extends JFrame implements ActionListener {
 
     public void actionPerformed(final ActionEvent ev){
         String cmd = ev.getActionCommand();
-        if (cmd.equals("stop")){
-            notifyStopped();
-        } else if (cmd.equals("start")) {
-            startSearch();
-        } else if(cmd.equals("Browse")) {
-            directoryChooser = new JFileChooser(".");
-            directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            int status = directoryChooser.showSaveDialog(null);
-
-            if(status == JFileChooser.APPROVE_OPTION){
-                String path = directoryChooser.getSelectedFile().getAbsolutePath();
-                directory.setText(path);
+        switch (cmd) {
+            case "stop" -> notifyStopped();
+            case "start" -> startSearch();
+            case "Browse" -> {
+                JFileChooser directoryChooser = new JFileChooser(".");
+                directoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                int status = directoryChooser.showSaveDialog(null);
+                if (status == JFileChooser.APPROVE_OPTION) {
+                    String path = directoryChooser.getSelectedFile().getAbsolutePath();
+                    directory.setText(path);
+                }
             }
         }
-    }
-
-    public void addListener(final InputListener l){
-        listeners.add(l);
     }
 
 
