@@ -48,7 +48,7 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
         this.printIntervals(intervals);
         vertx.close();
         Instant end = Instant.now();
-        System.out.println("Completed in " + Duration.between(start, end).toMillis() + " ms");    }
+        System.out.println("VertxSourceAnalyser, completed in " + Duration.between(start, end).toMillis() + " ms");    }
 
     @Override
     public void analyzeSources() {
@@ -76,7 +76,7 @@ public class VertXSourceAnalyser extends AbstractSourceAnalyser {
 
             vertx.close();
             Instant end = Instant.now();
-            view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
+            view.changeState("VertxSourceAnalyser, completed in " + Duration.between(start, end).toMillis() + " ms");
         }
 
     }

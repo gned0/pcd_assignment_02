@@ -40,7 +40,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
         this.printTopFiles(topFiles);
         this.printIntervals(intervals);
         Instant end = Instant.now();
-        System.out.println("Completed in " + Duration.between(start, end).toMillis() + " ms");
+        System.out.println("TaskSourceAnalyser, completed in " + Duration.between(start, end).toMillis() + " ms");
     }
 
     @Override
@@ -68,7 +68,7 @@ public class TaskSourceAnalyser extends AbstractSourceAnalyser {
             }
             executor.shutdown();
             Instant end = Instant.now();
-            view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
+            view.changeState("TaskSourceAnalyser, completed in " + Duration.between(start, end).toMillis() + " ms");
         }
     }
 

@@ -46,7 +46,7 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                 }, Throwable::printStackTrace);
 
         Instant end = Instant.now();
-        System.out.println("Completed in " + Duration.between(start, end).toMillis() + " ms");
+        System.out.println("RxSourceAnalyser, completed in " + Duration.between(start, end).toMillis() + " ms");
 
     }
 
@@ -84,7 +84,7 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                     })
                     .blockingSubscribe();
             Instant end = Instant.now();
-            view.changeState("Completed in " + Duration.between(start, end).toMillis() + " ms");
+            view.changeState("RxSourceAnalyser, completed in " + Duration.between(start, end).toMillis() + " ms");
 
         }
     }

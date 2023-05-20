@@ -51,7 +51,7 @@ public class ViewFrame extends JFrame implements ActionListener {
         expPanel.setSize(w,h);
 
         JPanel infoPanel = new JPanel();
-        state = new JTextField(20);
+        state = new JTextField(30);
         state.setText("Idle");
         state.setEditable(false);
         infoPanel.add(new JLabel("State"));
