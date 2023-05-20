@@ -32,7 +32,7 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                         .flatMap(path -> Flowable.fromIterable(listFiles(path)))
                         : Flowable.just(file.toPath()).subscribeOn(Schedulers.io()))
                 .filter(path -> path.toString().endsWith(".java"))
-                .flatMap(path -> Flowable.fromCallable(() -> countLines(path))
+                .flatMap(path -> Flowable.fromCallable(() -> this.countLines(path.toFile()))
                         .subscribeOn(Schedulers.computation())
                         .map(lines -> new Pair<>(path, lines)))
                 .doOnNext(file -> updateIntervals(file.second))
@@ -74,7 +74,7 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
                         }
                     })
                     .filter(path -> path.toString().endsWith(".java"))
-                    .flatMap(path -> Flowable.fromCallable(() -> countLines(path))
+                    .flatMap(path -> Flowable.fromCallable(() -> this.countLines(path.toFile()))
                             .subscribeOn(Schedulers.computation())
                             .map(lines -> new Pair<>(path, lines)))
                     .doOnNext(file -> {
@@ -136,11 +136,5 @@ public class RxSourceAnalyser extends AbstractSourceAnalyser {
         }
     }
 
-    private int countLines(Path path) {
-        try {
-            return (int)Files.lines(path).count();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to count lines: " + e.getMessage(), e);
-        }
-    }
+
 }

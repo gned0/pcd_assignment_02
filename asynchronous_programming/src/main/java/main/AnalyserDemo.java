@@ -63,7 +63,6 @@ public class AnalyserDemo {
                 assert input != null;
                 String[] params = input.split(" ");
                 scanner.close();
-                System.out.println("Directory: " + params[0]);
                 if (params.length == 4) {
                     String directory = params[0];
                     int ranges = Integer.parseInt(params[1]);
